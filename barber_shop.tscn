@@ -1,0 +1,177 @@
+[gd_scene load_steps=6 format=3 uid="uid://boo0edcxyefxu"]
+
+[ext_resource type="Script" uid="uid://db1q2kgsd7pgx" path="res://barber_shop_threaded.gd" id="1_27kgq"]
+[ext_resource type="Texture2D" uid="uid://cfxmodit40f0n" path="res://art/lobby_wide.png" id="2_27kgq"]
+[ext_resource type="Script" uid="uid://fwwjuwjuu4wq" path="res://threaded_logic.gd" id="2_iy5tw"]
+[ext_resource type="Texture2D" uid="uid://c1rllt8japjp0" path="res://art/seat_chair.png" id="3_uxxmk"]
+[ext_resource type="Texture2D" uid="uid://jpo2pe53vpur" path="res://art/barber_working.png" id="5_uxxmk"]
+
+[node name="BarberShop" type="Node2D"]
+position = Vector2(405, 224)
+script = ExtResource("1_27kgq")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="RoomBackground" type="TextureRect" parent="UI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -9.7
+anchor_top = -7.05
+anchor_right = 34.9
+anchor_bottom = 15.797002
+offset_right = -0.00012207031
+offset_bottom = 110.119934
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_27kgq")
+metadata/_edit_use_anchors_ = true
+
+[node name="BarberArea" type="ColorRect" parent="UI"]
+visible = false
+layout_mode = 0
+offset_left = 1000.0
+offset_top = 282.0
+offset_right = 1250.0
+offset_bottom = 532.0
+color = Color(0.033853278, 0.033853278, 0.033853274, 1)
+
+[node name="BarberSprite" type="ColorRect" parent="UI/BarberArea"]
+layout_mode = 0
+offset_left = 188.0
+offset_top = 109.0
+offset_right = 228.0
+offset_bottom = 149.0
+color = Color(0, 1, 0, 1)
+
+[node name="WaitingArea" type="ColorRect" parent="UI"]
+visible = false
+layout_mode = 0
+offset_left = -148.0
+offset_top = 243.0
+offset_right = 252.0
+offset_bottom = 363.0
+color = Color(0, 0, 1, 1)
+
+[node name="StatusLabel" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 299.0
+offset_top = -179.0
+offset_right = 421.0
+offset_bottom = -149.0
+text = "Barber sleeping"
+
+[node name="ModePanel" type="Panel" parent="UI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ModePanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ModeLabel" type="Label" parent="UI/ModePanel/VBoxContainer"]
+layout_mode = 2
+text = "Choose mode"
+
+[node name="ManualButton" type="Button" parent="UI/ModePanel/VBoxContainer"]
+layout_mode = 2
+text = "Manual mode"
+
+[node name="AutoButton" type="Button" parent="UI/ModePanel/VBoxContainer"]
+layout_mode = 2
+text = "Automatic mode"
+
+[node name="SeatsHBox" type="HBoxContainer" parent="UI/ModePanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="SeatsLabel" type="Label" parent="UI/ModePanel/VBoxContainer/SeatsHBox"]
+layout_mode = 2
+text = "Seats: 4"
+
+[node name="SeatsMinus" type="Button" parent="UI/ModePanel/VBoxContainer/SeatsHBox"]
+layout_mode = 2
+text = "-"
+
+[node name="SeatsPlus" type="Button" parent="UI/ModePanel/VBoxContainer/SeatsHBox"]
+layout_mode = 2
+text = "+"
+
+[node name="Seat1" type="Sprite2D" parent="UI"]
+position = Vector2(697, 326)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_uxxmk")
+offset = Vector2(0.35, 0.35)
+
+[node name="Seat2" type="Sprite2D" parent="UI"]
+position = Vector2(-109, 213)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_uxxmk")
+offset = Vector2(0.35, 0.35)
+
+[node name="Seat3" type="Sprite2D" parent="UI"]
+position = Vector2(301, 311)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_uxxmk")
+offset = Vector2(0.35, 0.35)
+
+[node name="Seat4" type="Sprite2D" parent="UI"]
+position = Vector2(513, 318)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_uxxmk")
+offset = Vector2(0.35, 0.35)
+
+[node name="Seat5" type="Sprite2D" parent="UI"]
+position = Vector2(864, 315)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_uxxmk")
+offset = Vector2(0.35, 0.35)
+
+[node name="Seat6" type="Sprite2D" parent="UI"]
+position = Vector2(160, 20)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_uxxmk")
+offset = Vector2(0.35, 0.35)
+
+[node name="Seat7" type="Sprite2D" parent="UI"]
+position = Vector2(347, 22.999985)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_uxxmk")
+offset = Vector2(0.35, 0.35)
+
+[node name="Seat8" type="Sprite2D" parent="UI"]
+position = Vector2(523, 17.999985)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_uxxmk")
+offset = Vector2(0.35, 0.35)
+
+[node name="Seat9" type="Sprite2D" parent="UI"]
+position = Vector2(668, 15)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_uxxmk")
+offset = Vector2(0.35, 0.35)
+
+[node name="Seat10" type="Sprite2D" parent="UI"]
+position = Vector2(811, 13)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_uxxmk")
+offset = Vector2(0.35, 0.35)
+
+[node name="CustomerTimer" type="Timer" parent="."]
+
+[node name="HaircutTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="ThreadedLogic" type="Node" parent="."]
+script = ExtResource("2_iy5tw")
+
+[node name="BarberSprite2D" type="Sprite2D" parent="."]
+position = Vector2(1300.0001, 362)
+scale = Vector2(0.85, 0.856)
+texture = ExtResource("5_uxxmk")
+
+[connection signal="timeout" from="CustomerTimer" to="." method="_on_customer_timer_timeout"]

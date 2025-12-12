@@ -1,0 +1,35 @@
+[gd_scene load_steps=12 format=3 uid="uid://s6c4rtkp16uq"]
+
+[ext_resource type="Texture2D" uid="uid://bykb8vm5fjjun" path="res://art/girl_down.png" id="1_gn8fi"]
+[ext_resource type="Script" uid="uid://cry6po8rtoyi4" path="res://Customer.gd" id="1_r8ta2"]
+[ext_resource type="Texture2D" uid="uid://c6ted2rhto7y6" path="res://art/girl_up.png" id="3_0rcyg"]
+[ext_resource type="Texture2D" uid="uid://cwaascn7ipvj4" path="res://art/girl_left.png" id="4_frhio"]
+[ext_resource type="Texture2D" uid="uid://b7v8b670oiroq" path="res://art/girl_right.png" id="5_551dw"]
+[ext_resource type="Texture2D" uid="uid://rko1810i2hg8" path="res://art/1.png" id="6_crw8f"]
+[ext_resource type="Texture2D" uid="uid://eljdujjnfmhb" path="res://art/2.png" id="7_5sdco"]
+[ext_resource type="Texture2D" uid="uid://pfw66ej8uvh4" path="res://art/3.png" id="8_aive0"]
+[ext_resource type="Texture2D" uid="uid://qsupfksydgvg" path="res://art/4.png" id="9_xnek4"]
+[ext_resource type="Texture2D" uid="uid://hqxpv80r36th" path="res://art/5.png" id="10_gwwo3"]
+[ext_resource type="Texture2D" uid="uid://cnpc36t103fa3" path="res://art/6.png" id="11_bfkud"]
+
+[node name="Customer" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_r8ta2")
+tex_down = ExtResource("1_gn8fi")
+tex_up = ExtResource("3_0rcyg")
+tex_left = ExtResource("4_frhio")
+tex_right = ExtResource("5_551dw")
+tex_style_1 = ExtResource("6_crw8f")
+tex_style_2 = ExtResource("7_5sdco")
+tex_style_3 = ExtResource("8_aive0")
+tex_style_4 = ExtResource("9_xnek4")
+tex_style_5 = ExtResource("10_gwwo3")
+tex_style_6 = ExtResource("11_bfkud")
+
+[node name="Sprite" type="Sprite2D" parent="."]
+texture = ExtResource("1_gn8fi")

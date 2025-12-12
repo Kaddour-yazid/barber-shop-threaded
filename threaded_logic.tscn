@@ -1,0 +1,6 @@
+[gd_scene load_steps=2 format=3 uid="uid://3aii55r2n1sn"]
+
+[ext_resource type="Script" uid="uid://fwwjuwjuu4wq" path="res://threaded_logic.gd" id="1_fse2k"]
+
+[node name="ThreadedLogic" type="Node"]
+script = ExtResource("1_fse2k")

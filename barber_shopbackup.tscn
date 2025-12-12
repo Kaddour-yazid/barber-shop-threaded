@@ -1,0 +1,121 @@
+[gd_scene load_steps=2 format=3 uid="uid://bxf7m0h6y0jqe"]
+
+[ext_resource type="Script" uid="uid://ccdxkemry7par" path="res://barber_shop.gd" id="1_pd2im"]
+
+[node name="BarberShop" type="Node2D"]
+position = Vector2(405, 224)
+script = ExtResource("1_pd2im")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="RoomBackground" type="ColorRect" parent="UI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -9.597
+anchor_top = -4.859
+anchor_right = 38.025
+anchor_bottom = 21.625002
+offset_left = -15.119995
+offset_top = -20.639984
+offset_bottom = -6.1035156e-05
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.74509805, 0.74509805, 0.74509805, 1)
+metadata/_edit_use_anchors_ = true
+
+[node name="BarberArea" type="ColorRect" parent="UI"]
+layout_mode = 0
+offset_left = -33.0
+offset_top = -7.0
+offset_right = 217.0
+offset_bottom = 243.0
+color = Color(0.033853278, 0.033853278, 0.033853274, 1)
+
+[node name="BarberSprite" type="ColorRect" parent="UI/BarberArea"]
+layout_mode = 0
+offset_left = 188.0
+offset_top = 109.0
+offset_right = 228.0
+offset_bottom = 149.0
+color = Color(0, 1, 0, 1)
+
+[node name="WaitingArea" type="ColorRect" parent="UI"]
+layout_mode = 0
+offset_left = -148.0
+offset_top = 243.0
+offset_right = 252.0
+offset_bottom = 363.0
+color = Color(0, 0, 1, 1)
+
+[node name="Seat1" type="ColorRect" parent="UI"]
+layout_mode = 0
+offset_left = -147.0
+offset_top = 245.0
+offset_right = -107.0
+offset_bottom = 285.0
+color = Color(1, 0, 0, 1)
+
+[node name="Seat2" type="ColorRect" parent="UI"]
+layout_mode = 0
+offset_left = -81.0
+offset_top = 246.0
+offset_right = -41.0
+offset_bottom = 286.0
+color = Color(1, 0, 0, 1)
+
+[node name="Seat3" type="ColorRect" parent="UI"]
+layout_mode = 0
+offset_left = -17.0
+offset_top = 246.0
+offset_right = 23.0
+offset_bottom = 286.0
+color = Color(1, 0, 0, 1)
+
+[node name="Seat4" type="ColorRect" parent="UI"]
+layout_mode = 0
+offset_left = 55.0
+offset_top = 244.0
+offset_right = 95.0
+offset_bottom = 284.0
+color = Color(1, 0, 0, 1)
+
+[node name="StatusLabel" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 30.0
+offset_top = -41.0
+offset_right = 152.0
+offset_bottom = -18.0
+text = "Barber sleeping"
+
+[node name="ModePanel" type="Panel" parent="UI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ModePanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ModeLabel" type="Label" parent="UI/ModePanel/VBoxContainer"]
+layout_mode = 2
+text = "Choose mode"
+
+[node name="ManualButton" type="Button" parent="UI/ModePanel/VBoxContainer"]
+layout_mode = 2
+text = "Manual mode"
+
+[node name="AutoButton" type="Button" parent="UI/ModePanel/VBoxContainer"]
+layout_mode = 2
+text = "Automatic mode"
+
+[node name="CustomerTimer" type="Timer" parent="."]
+
+[node name="HaircutTimer" type="Timer" parent="."]
+one_shot = true
+
+[connection signal="timeout" from="CustomerTimer" to="." method="_on_customer_timer_timeout"]

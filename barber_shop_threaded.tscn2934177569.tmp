@@ -1,0 +1,428 @@
+[gd_scene load_steps=19 format=3 uid="uid://dplvhefulvy8d"]
+
+[ext_resource type="Script" uid="uid://db1q2kgsd7pgx" path="res://barber_shop_threaded.gd" id="1_q28ew"]
+[ext_resource type="Texture2D" uid="uid://cfxmodit40f0n" path="res://art/lobby_wide.png" id="2_m8ba1"]
+[ext_resource type="Texture2D" uid="uid://da4uri1ynvjnt" path="res://art/barber_sleepong.png" id="2_r8lyi"]
+[ext_resource type="Texture2D" uid="uid://c1rllt8japjp0" path="res://art/seat_chair.png" id="3_r8lyi"]
+[ext_resource type="Script" uid="uid://fwwjuwjuu4wq" path="res://threaded_logic.gd" id="4_s8joc"]
+[ext_resource type="Texture2D" uid="uid://jpo2pe53vpur" path="res://art/barber_working.png" id="5_m8ba1"]
+[ext_resource type="Texture2D" uid="uid://bgy50n7nmav7k" path="res://art/mute.png" id="6_11ty3"]
+[ext_resource type="Texture2D" uid="uid://ld7f3bk6n68a" path="res://art/unmute.png" id="7_nxun5"]
+[ext_resource type="Texture2D" uid="uid://dqxke52myep8a" path="res://art/back.png" id="8_f4in3"]
+[ext_resource type="AudioStream" uid="uid://cm8hiomdu112r" path="res://audio/barber_ambience.mp3" id="9_f4in3"]
+[ext_resource type="Texture2D" uid="uid://basrjpiteqdb2" path="res://art/backd.png" id="9_osgov"]
+[ext_resource type="Texture2D" uid="uid://dq5k34h544n0t" path="res://art/pcdesk.png" id="12_veunx"]
+[ext_resource type="Texture2D" uid="uid://2okeij8cw8pw" path="res://art/pclog.png" id="13_7366p"]
+[ext_resource type="Texture2D" uid="uid://bv8fn6l42l53e" path="res://art/settings.png" id="14_hvq46"]
+[ext_resource type="Texture2D" uid="uid://c432gg5piq7nb" path="res://art/settingsd.png" id="15_h5e08"]
+[ext_resource type="Texture2D" uid="uid://bdl51q6bj6udb" path="res://art/bkg - Copy.png" id="16_eckv2"]
+[ext_resource type="Texture2D" uid="uid://uj8vd8km7eyh" path="res://art/reset.png" id="17_eckv2"]
+[ext_resource type="Texture2D" uid="uid://ba7lie5mkgtle" path="res://art/resetd.png" id="18_t22oq"]
+
+[node name="BarberShop" type="Node2D"]
+position = Vector2(405, 224)
+script = ExtResource("1_q28ew")
+barber_tex_sleep = ExtResource("2_r8lyi")
+barber_tex_work = ExtResource("5_m8ba1")
+
+[node name="UI" type="Control" parent="."]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="RoomBackground" type="TextureRect" parent="UI"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = -9.7
+anchor_top = -7.05
+anchor_right = 34.9
+anchor_bottom = 15.797002
+offset_right = -0.00012207031
+offset_bottom = 110.119934
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("2_m8ba1")
+metadata/_edit_use_anchors_ = true
+
+[node name="BarberArea" type="ColorRect" parent="UI"]
+visible = false
+layout_mode = 0
+offset_left = 1000.0
+offset_top = 282.0
+offset_right = 1250.0
+offset_bottom = 532.0
+color = Color(0.033853278, 0.033853278, 0.033853274, 1)
+
+[node name="BarberSprite" type="ColorRect" parent="UI/BarberArea"]
+layout_mode = 0
+offset_left = 188.0
+offset_top = 109.0
+offset_right = 228.0
+offset_bottom = 149.0
+color = Color(0, 1, 0, 1)
+
+[node name="WaitingArea" type="ColorRect" parent="UI"]
+visible = false
+layout_mode = 0
+offset_left = -148.0
+offset_top = 243.0
+offset_right = 252.0
+offset_bottom = 363.0
+color = Color(0, 0, 1, 1)
+
+[node name="StatusLabel" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 403.0
+offset_top = -203.0
+offset_right = 525.0
+offset_bottom = -180.0
+text = "Barber sleeping"
+
+[node name="ModePanel" type="Panel" parent="UI"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="UI/ModePanel"]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="ModeLabel" type="Label" parent="UI/ModePanel/VBoxContainer"]
+layout_mode = 2
+text = "Choose mode"
+
+[node name="ManualButton" type="Button" parent="UI/ModePanel/VBoxContainer"]
+layout_mode = 2
+text = "Manual mode"
+
+[node name="AutoButton" type="Button" parent="UI/ModePanel/VBoxContainer"]
+layout_mode = 2
+text = "Automatic mode"
+
+[node name="SeatsHBox" type="HBoxContainer" parent="UI/ModePanel/VBoxContainer"]
+layout_mode = 2
+
+[node name="SeatsLabel" type="Label" parent="UI/ModePanel/VBoxContainer/SeatsHBox"]
+layout_mode = 2
+text = "Seats: 4"
+
+[node name="SeatsMinus" type="Button" parent="UI/ModePanel/VBoxContainer/SeatsHBox"]
+layout_mode = 2
+text = "-"
+
+[node name="SeatsPlus" type="Button" parent="UI/ModePanel/VBoxContainer/SeatsHBox"]
+layout_mode = 2
+text = "+"
+
+[node name="Seat1" type="Sprite2D" parent="UI"]
+position = Vector2(697, 326)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_r8lyi")
+offset = Vector2(0.35, 0.35)
+
+[node name="QueueLabel" type="Label" parent="UI/Seat1"]
+offset_left = -27.865892
+offset_top = 266.22803
+offset_right = 47.770096
+offset_bottom = 316.25745
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Seat2" type="Sprite2D" parent="UI"]
+position = Vector2(-109, 213)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_r8lyi")
+offset = Vector2(0.35, 0.35)
+
+[node name="QueueLabel" type="Label" parent="UI/Seat2"]
+offset_left = -39.808395
+offset_top = 251.9339
+offset_right = 35.82759
+offset_bottom = 301.96332
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Seat3" type="Sprite2D" parent="UI"]
+position = Vector2(301, 311)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_r8lyi")
+offset = Vector2(0.35, 0.35)
+
+[node name="QueueLabel" type="Label" parent="UI/Seat3"]
+offset_left = -41.798798
+offset_top = 268.0148
+offset_right = 33.83719
+offset_bottom = 318.04422
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Seat4" type="Sprite2D" parent="UI"]
+position = Vector2(513, 318)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_r8lyi")
+offset = Vector2(0.35, 0.35)
+
+[node name="QueueLabel" type="Label" parent="UI/Seat4"]
+offset_left = -35.82755
+offset_top = 284.09564
+offset_right = 39.808437
+offset_bottom = 334.12506
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Seat5" type="Sprite2D" parent="UI"]
+position = Vector2(864, 315)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_r8lyi")
+offset = Vector2(0.35, 0.35)
+
+[node name="QueueLabel" type="Label" parent="UI/Seat5"]
+offset_left = -37.818043
+offset_top = 291.24274
+offset_right = 37.817944
+offset_bottom = 341.27216
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Seat6" type="Sprite2D" parent="UI"]
+position = Vector2(160, 20)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_r8lyi")
+offset = Vector2(0.35, 0.35)
+
+[node name="QueueLabel" type="Label" parent="UI/Seat6"]
+offset_left = -55.73178
+offset_top = -346.63245
+offset_right = 19.904205
+offset_bottom = -296.60303
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Seat7" type="Sprite2D" parent="UI"]
+position = Vector2(347, 22.999985)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_r8lyi")
+offset = Vector2(0.35, 0.35)
+
+[node name="QueueLabel" type="Label" parent="UI/Seat7"]
+offset_left = -41.79879
+offset_top = -353.77948
+offset_right = 33.837196
+offset_bottom = -303.75006
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Seat8" type="Sprite2D" parent="UI"]
+position = Vector2(523, 17.999985)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_r8lyi")
+offset = Vector2(0.35, 0.35)
+
+[node name="QueueLabel" type="Label" parent="UI/Seat8"]
+offset_left = -43.789314
+offset_top = -341.27213
+offset_right = 31.846672
+offset_bottom = -291.2427
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Seat9" type="Sprite2D" parent="UI"]
+position = Vector2(751, 26.999985)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_r8lyi")
+offset = Vector2(0.35, 0.35)
+
+[node name="QueueLabel" type="Label" parent="UI/Seat9"]
+offset_left = -27.86589
+offset_top = -362.71335
+offset_right = 47.770096
+offset_bottom = -312.68393
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Seat10" type="Sprite2D" parent="UI"]
+position = Vector2(923, 22.999985)
+scale = Vector2(0.5024063, 0.5596706)
+texture = ExtResource("3_r8lyi")
+offset = Vector2(0.35, 0.35)
+
+[node name="QueueLabel" type="Label" parent="UI/Seat10"]
+offset_left = -27.865852
+offset_top = -335.91183
+offset_right = 47.770134
+offset_bottom = -285.88242
+theme_override_font_sizes/font_size = 32
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="QueueLabel" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = 69.0
+offset_top = -205.0
+offset_right = 269.0
+offset_bottom = -155.0
+
+[node name="StatsLabel" type="Label" parent="UI"]
+layout_mode = 0
+offset_left = -263.0
+offset_top = -209.0
+offset_right = -63.0
+offset_bottom = -159.0
+
+[node name="MuteButton" type="TextureButton" parent="UI"]
+layout_mode = 0
+offset_left = 1300.0
+offset_top = -232.0
+offset_right = 1400.0
+offset_bottom = -132.0
+toggle_mode = true
+texture_normal = ExtResource("6_11ty3")
+texture_pressed = ExtResource("7_nxun5")
+
+[node name="BackButton" type="TextureButton" parent="UI"]
+layout_mode = 0
+offset_left = -391.0
+offset_top = -238.0
+offset_right = -291.0
+offset_bottom = -138.0
+texture_normal = ExtResource("8_f4in3")
+texture_pressed = ExtResource("9_osgov")
+
+[node name="CustomerTimer" type="Timer" parent="."]
+
+[node name="HaircutTimer" type="Timer" parent="."]
+one_shot = true
+
+[node name="ThreadedLogic" type="Node" parent="."]
+script = ExtResource("4_s8joc")
+
+[node name="BarberSprite2D" type="Sprite2D" parent="."]
+position = Vector2(1306.0001, 359)
+scale = Vector2(0.916, 0.932)
+texture = ExtResource("5_m8ba1")
+
+[node name="BgmPlayer" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("9_f4in3")
+volume_db = -36.781
+autoplay = true
+parameters/looping = true
+
+[node name="PcDesk" type="TextureRect" parent="."]
+offset_left = -410.0
+offset_top = 449.0
+offset_right = -110.0
+offset_bottom = 749.0
+mouse_filter = 0
+texture = ExtResource("12_veunx")
+
+[node name="PcLogPopup" type="TextureRect" parent="."]
+visible = false
+offset_left = -102.0
+offset_top = -384.0
+offset_right = 1081.0
+offset_bottom = 814.0
+mouse_filter = 0
+texture = ExtResource("13_7366p")
+
+[node name="PcLogText" type="RichTextLabel" parent="PcLogPopup"]
+layout_mode = 0
+offset_left = 375.0
+offset_top = 314.0
+offset_right = 806.0
+offset_bottom = 656.0
+
+[node name="SettingsButton" type="TextureButton" parent="."]
+offset_left = 1208.0
+offset_top = -234.0
+offset_right = 1308.0
+offset_bottom = -134.0
+texture_normal = ExtResource("14_hvq46")
+texture_pressed = ExtResource("15_h5e08")
+
+[node name="SettingsPopup" type="TextureRect" parent="."]
+offset_left = -233.0
+offset_top = -157.0
+offset_right = 1217.0
+offset_bottom = 615.0
+texture = ExtResource("16_eckv2")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="SettingsPopup"]
+layout_mode = 1
+anchors_preset = -1
+anchor_left = 0.24700001
+anchor_right = 0.75100005
+anchor_bottom = 1.0
+offset_left = 110.849976
+offset_top = 54.0
+offset_right = -186.95007
+offset_bottom = -171.0
+
+[node name="Timing" type="Label" parent="SettingsPopup/VBoxContainer"]
+layout_mode = 2
+text = "Timing"
+
+[node name="ArrivalSpeedSlider2" type="Label" parent="SettingsPopup/VBoxContainer"]
+layout_mode = 2
+text = "ArrivalSpeedSlider"
+
+[node name="ArrivalSpeedSlider" type="HSlider" parent="SettingsPopup/VBoxContainer"]
+layout_mode = 2
+
+[node name="HaircutSpeedSlider2" type="Label" parent="SettingsPopup/VBoxContainer"]
+layout_mode = 2
+text = "HaircutSpeedSlider"
+
+[node name="HaircutSpeedSlider" type="HSlider" parent="SettingsPopup/VBoxContainer"]
+layout_mode = 2
+
+[node name="WalkSpeedSlider2" type="Label" parent="SettingsPopup/VBoxContainer"]
+layout_mode = 2
+text = "WalkSpeedSlider"
+
+[node name="WalkSpeedSlider" type="HSlider" parent="SettingsPopup/VBoxContainer"]
+layout_mode = 2
+
+[node name="Behaviour" type="Label" parent="SettingsPopup/VBoxContainer"]
+layout_mode = 2
+text = "Behaviour"
+
+[node name="PatienceSlider" type="HSlider" parent="SettingsPopup/VBoxContainer"]
+layout_mode = 2
+
+[node name="CloseSettingsButton" type="Button" parent="SettingsPopup"]
+layout_mode = 0
+offset_left = 365.0
+offset_top = 660.0
+offset_right = 473.0
+offset_bottom = 768.0
+icon = ExtResource("9_osgov")
+flat = true
+
+[node name="ResetButton" type="TextureButton" parent="SettingsPopup"]
+layout_mode = 0
+offset_left = 900.0
+offset_top = 620.0
+offset_right = 1100.0
+offset_bottom = 820.0
+toggle_mode = true
+texture_normal = ExtResource("17_eckv2")
+texture_pressed = ExtResource("18_t22oq")
+
+[connection signal="timeout" from="CustomerTimer" to="." method="_on_customer_timer_timeout"]
+[connection signal="gui_input" from="PcDesk" to="." method="_on_PcDesk_gui_input"]
+[connection signal="gui_input" from="SettingsPopup/VBoxContainer/ArrivalSpeedSlider" to="." method="_on_arrival_speed_slider_gui_input"]
+[connection signal="gui_input" from="SettingsPopup/VBoxContainer/HaircutSpeedSlider" to="." method="_on_haircut_speed_slider_gui_input"]
+[connection signal="gui_input" from="SettingsPopup/VBoxContainer/WalkSpeedSlider" to="." method="_on_walk_speed_slider_gui_input"]
+[connection signal="gui_input" from="SettingsPopup/VBoxContainer/PatienceSlider" to="." method="_on_patience_slider_gui_input"]
+[connection signal="gui_input" from="SettingsPopup/CloseSettingsButton" to="." method="_on_close_settings_button_gui_input"]

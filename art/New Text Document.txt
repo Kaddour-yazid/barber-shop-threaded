@@ -1,0 +1,589 @@
+1. Introduction
+
+L’objectif de ce TP est de construire un pipeline complet de machine learning pour la détection de trafic malicieux dans un jeu de données réseau (network_data.csv).
+
+Les grandes étapes sont 
+
+chargement et nettoyage du dataset,
+
+création de nouvelles variables (feature engineering),
+
+préparation des données (imputation, normalisation, encodage des catégories),
+
+gestion du déséquilibre de classes (SMOTE),
+
+réduction de dimension (PCA),
+
+sélection de variables (ANOVA, RFE, RandomForest embedded),
+
+comparaison de plusieurs modèles de classification,
+
+optimisation d’hyperparamètres (GridSearchCV),
+
+combinaison de modèles (VotingClassifier).
+
+Les sections suivantes détaillent les réponses aux questions Q1 à Q14.
+
+2. Question 1 – Chargement et nettoyage initial des données
+Objectif
+
+Charger le fichier network_data.csv, typer correctement les colonnes importantes et vérifier la structure des données.
+
+Code (exemple)
+import pandas as pd
+
+df = pd.read_csv(network_data.csv)
+
+# Forcer certains champs en numérique
+for col in [cpu_percent, mem_percent, anomaly_score]
+    df[col] = pd.to_numeric(df[col], errors=coerce)
+
+# Convertir les timestamps
+for col in [datetime, last_seen]
+    df[col] = pd.to_datetime(df[col], errors=coerce)
+
+# Label en catégorie
+df[label] = df[label].astype(category)
+
+print(df.info())
+print(df[label].value_counts())
+
+Explication
+
+pd.read_csv charge le fichier en mémoire.
+
+pd.to_numeric(..., errors='coerce') remplace les valeurs non numériques par NaN, ce qui facilite l’imputation plus tard.
+
+pd.to_datetime convertit les dates sous forme de chaîne en objets datetime manipulables.
+
+On passe label en type category puisque c’est une variable qualitative (benign, malicious, parfois unknown).
+
+Résultat attendu
+
+Un DataFrame propre avec des types adaptés (numériques, datetime, catégoriel).
+
+On observe la distribution des labels (par ex. benign  malicious, quelques unknown).
+
+3. Question 2 – Feature engineering et définition de X  y
+Objectif
+
+Créer de nouvelles features temporelles et définir clairement les variables explicatives X et la cible y.
+
+Code
+df_fe = df.copy()
+
+# Features temporelles
+df_fe[hour] = df_fe[datetime].dt.hour
+df_fe[weekday] = df_fe[datetime].dt.weekday
+
+# Garder seulement benign  malicious
+df_fe = df_fe[df_fe[label].isin([benign, malicious])].copy()
+
+# Cible
+y = df_fe[label]
+
+# Features  on enlève ce qu'on ne veut pas utiliser comme entrée
+cols_to_drop = [label, datetime, last_seen, src_ip, dst_ip, ip]
+X = df_fe.drop(columns=[c for c in cols_to_drop if c in df_fe.columns])
+
+print(X.columns)
+print(X.shape, y.shape)
+
+Explication
+
+hour et weekday enrichissent l’information temporelle (certains comportements sont plus fréquents la nuit, le week-end, etc.).
+
+On retire les lignes où label == unknown pour avoir un problème binaire bien défini.
+
+X contient les colonnes explicatives (ports, bytes, protocol, hostname, os, owner, cpumem, anomaly_score, hour, weekday).
+
+y contient uniquement les labels benign ou malicious.
+
+4. Question 3 – Pipeline numérique
+Objectif
+
+Préparer les colonnes numériques  gérer les valeurs manquantes et mettre les variables à la même échelle.
+
+Code
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import StandardScaler
+
+num_cols = X.select_dtypes(include=[int64, float64, int32, float32]).columns.tolist()
+
+num_pipe = Pipeline([
+    (imputer, SimpleImputer(strategy=median)),
+    (scaler, StandardScaler()),
+])
+
+Explication
+
+num_cols liste les colonnes numériques (ports, bytes, packets, cpu_percent, mem_percent, anomaly_score, hour, weekday…).
+
+SimpleImputer(strategy='median') remplace les NaN par la médiane de la colonne (robuste aux outliers).
+
+StandardScaler centreréduit les données (moyenne ≈ 0, variance ≈ 1), ce qui est important pour les modèles comme SVM, k-NN ou régression logistique.
+
+5. Question 4 – Pipeline catégoriel
+Objectif
+
+Transformer les colonnes catégorielles en variables numériques utilisables par les modèles.
+
+Code
+from sklearn.pipeline import Pipeline
+from sklearn.impute import SimpleImputer
+from sklearn.preprocessing import OneHotEncoder
+
+cat_cols = [protocol, hostname, os, owner]
+cat_cols = [c for c in cat_cols if c in X.columns]
+
+cat_pipe = Pipeline([
+    (imputer, SimpleImputer(strategy=constant, fill_value=missing)),
+    (encoder, OneHotEncoder(handle_unknown=ignore, sparse_output=False)),
+])
+
+Explication
+
+On sélectionne les colonnes réellement présentes  protocol, hostname, os, owner.
+
+SimpleImputer remplace les valeurs manquantes par la valeur missing.
+
+OneHotEncoder crée une colonne binaire par catégorie (ex. protocol_TCP, protocol_UDP, os_Linux, etc.).
+
+handle_unknown='ignore' évite les erreurs si une nouvelle catégorie apparaît au test.
+
+sparse_output=False donne un tableau dense (plus simple à manipuler pour ce TP).
+
+6. Question 5 – Fusion des pipelines et obtention de X_prepared
+Objectif
+
+Combiner les traitements numériques et catégoriels dans un seul transformeur et obtenir la matrice finale prête pour les modèles.
+
+Code
+from sklearn.compose import ColumnTransformer
+
+preproc = ColumnTransformer(
+    transformers=[
+        (num, num_pipe, num_cols),
+        (cat, cat_pipe, cat_cols),
+    ],
+    remainder=drop
+)
+
+X_prepared = preproc.fit_transform(X)
+
+# Récupérer les noms de colonnes
+num_features = num_cols
+ohe = preproc.named_transformers_[cat][encoder]
+cat_feature_names = ohe.get_feature_names_out(cat_cols).tolist()
+all_columns = num_features + cat_feature_names
+
+Explication
+
+ColumnTransformer applique num_pipe aux colonnes numériques et cat_pipe aux colonnes catégorielles.
+
+X_prepared est un tableau entièrement numérique (par ex. 195 lignes × ~32 colonnes).
+
+all_columns contient les noms de toutes les colonnes transformées (utile pour la sélection de features plus tard).
+
+7. Question 6 – PCA 2D (visualisation)
+Objectif
+
+Projeter les données dans un espace 2D pour visualiser la structure et la séparation des classes.
+
+Code
+from sklearn.decomposition import PCA
+import matplotlib.pyplot as plt
+
+pca = PCA(n_components=2, random_state=0)
+X_pca2 = pca.fit_transform(X_prepared)
+
+print(Variance expliquée , pca.explained_variance_ratio_)
+
+plt.figure(figsize=(6, 5))
+for label in y.unique()
+    idx = (y == label)
+    plt.scatter(X_pca2[idx, 0], X_pca2[idx, 1], label=label, alpha=0.5, s=10)
+
+plt.xlabel(PC1)
+plt.ylabel(PC2)
+plt.title(PCA (2D) des données réseau)
+plt.legend()
+plt.show()
+
+Explication
+
+La PCA calcule des combinaisons linéaires des features pour maximiser la variance expliquée.
+
+Les deux premières composantes (PC1, PC2) capturent une partie significative (mais pas totale) de la variabilité.
+
+Le scatter plot permet de voir si les points benign et malicious forment des groupes différents (ce qui est en général le cas, au moins partiellement).
+
+8. Question 7 – TrainTest split et SMOTE
+Objectif
+
+Séparer les données en ensemble d’entraînement et de test, puis équilibrer les classes avec SMOTE.
+
+Code
+from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE
+from collections import Counter
+
+X_train_used, X_test_used, y_train_used, y_test_used = train_test_split(
+    X_prepared,
+    y,
+    test_size=0.4,
+    stratify=y,
+    random_state=0,
+)
+
+print(Avant SMOTE , Counter(y_train_used))
+
+smote = SMOTE(k_neighbors=1, random_state=13)
+X_train_used, y_train_used = smote.fit_resample(X_train_used, y_train_used)
+
+print(Après SMOTE , Counter(y_train_used))
+
+Explication
+
+train_test_split coupe les données en 60% train  40% test avec stratification (même proportion de benign  malicious).
+
+On observe que la classe malicious est minoritaire dans le train.
+
+SMOTE génère des exemples synthétiques pour la classe minoritaire → après SMOTE les classes sont équilibrées (même nombre de lignes pour chaque classe).
+
+9. Question 8 – Sélection de variables par ANOVA
+Objectif
+
+Sélectionner les k meilleures variables selon un test ANOVA (f_classif).
+
+Code
+import numpy as np
+from sklearn.feature_selection import SelectKBest, f_classif
+
+def select_features_anova(X, y, all_columns, keep=10)
+    X = np.asarray(X)
+    all_columns = np.array(all_columns)
+
+    # Retirer les colonnes constantes
+    non_constant_mask = np.std(X, axis=0)  0
+    X_nc = X[, non_constant_mask]
+    cols_nc = all_columns[non_constant_mask]
+
+    selector = SelectKBest(score_func=f_classif, k=min(keep, X_nc.shape[1]))
+    selector.fit(X_nc, y)
+
+    scores = selector.scores_
+    feature_scores = {col score for col, score in zip(cols_nc, scores)}
+    feature_scores_sorted = dict(
+        sorted(feature_scores.items(), key=lambda x x[1], reverse=True)
+    )
+
+    for name, score in feature_scores_sorted.items()
+        print(f{name40s} {score.4f})
+
+    top_idx_nc = np.argsort(scores)[-keep][-1]
+    top_features = cols_nc[top_idx_nc]
+    print(nTop features ANOVA , top_features)
+
+    top_idx = [int(np.where(all_columns == f)[0][0]) for f in top_features]
+    return np.array(top_idx)
+
+Explication
+
+ANOVA compare la variance intra-classe et inter-classe  plus le score est élevé, plus la feature différencie benign et malicious.
+
+On trie les features par score décroissant et on retient les keep meilleures (souvent packets, anomaly_score, cpu_percent, etc.).
+
+On obtient les indices top_idx_anova qui permettent de restreindre X_train_used et X_test_used à ces colonnes.
+
+10. Question 9 – RFE + LinearSVC
+Objectif
+
+Utiliser une sélection de variables de type wrapper  RFE (Recursive Feature Elimination) avec un modèle LinearSVC.
+
+Code (celui qui te donne les sorties que tu as montrées)
+import numpy as np
+from sklearn.feature_selection import RFE
+from sklearn.svm import LinearSVC
+
+def select_features_rfe_svc(X, y, all_columns, keep=10)
+    X = np.asarray(X)
+    all_columns = np.array(all_columns)
+
+    svc = LinearSVC(
+        penalty=l2,
+        dual=False,
+        max_iter=10000,
+        random_state=0
+    )
+
+    rfe = RFE(estimator=svc, n_features_to_select=min(keep, X.shape[1]), step=1)
+    rfe.fit(X, y)
+
+    ranking = rfe.ranking_
+    scores = -ranking   # 1 - -1, 2 - -2, etc.
+    order = np.argsort(scores)[-1]
+
+    feature_scores_sorted = {all_columns[i] scores[i] for i in order}
+    for name, sc in feature_scores_sorted.items()
+        print(f{name40s} {sc.1f})
+
+    top_idx = np.where(ranking == 1)[0]
+    top_features = all_columns[top_idx]
+    print(nTop features RFE+LinearSVC , top_features)
+
+    return top_idx
+
+Résultat (ton output)
+
+Tu as obtenu quelque chose comme 
+
+Scores RFE (plus grand = mieux) 
+owner_carol        -1.0
+hostname_host-F    -1.0
+hostname_host-H    -1.0
+hostname_host-K    -1.0
+anomaly_score      -1.0
+hostname_host-B    -1.0
+hostname_host-C    -1.0
+hostname_host-E    -1.0
+dst_port           -1.0
+packets            -1.0
+...
+
+Top features RFE+LinearSVC 
+['dst_port' 'packets' 'anomaly_score' 'hostname_host-B' 'hostname_host-C'
+ 'hostname_host-E' 'hostname_host-F' 'hostname_host-H' 'hostname_host-K'
+ 'owner_carol']
+
+Explication
+
+Toutes les features avec ranking = 1 sont considérées comme les plus importantes → on leur donne un score de -1.
+
+Les autres ont ranking  1, donc des scores plus bas (-2, -3, …).
+
+Les 10 features sélectionnées sont les plus utiles pour un SVM linéaire 
+
+dst_port, packets, anomaly_score,
+
+des hostnames spécifiques (host-B, host-C, host-E, host-F, host-H, host-K),
+
+owner_carol.
+
+Ces variables sont donc très informatives pour distinguer benign et malicious.
+
+11. Question 10 – Sélection embedded via RandomForest
+Objectif
+
+Utiliser l’importance des features dans un RandomForest pour sélectionner les variables les plus utiles.
+
+Schéma de code
+from sklearn.ensemble import RandomForestClassifier
+import numpy as np
+
+def embedded_rf_selection(X, y, all_columns, keep=10)
+    X = np.asarray(X)
+    all_columns = np.array(all_columns)
+
+    rf = RandomForestClassifier(n_estimators=200, random_state=0)
+    rf.fit(X, y)
+
+    importances = rf.feature_importances_
+    order = np.argsort(importances)[-1]
+
+    feature_importance_dict = {all_columns[i] importances[i] for i in order}
+    for name, imp in feature_importance_dict.items()
+        print(f{name40s} {imp.4f})
+
+    topk_idx = order[keep]
+    top_features = all_columns[topk_idx]
+    print(nTop features RF , top_features)
+
+    return topk_idx
+
+Explication
+
+Chaque arbre dans la forêt mesure la réduction d’impureté due à chaque split, ce qui permet d’estimer l’importance de chaque feature.
+
+Les features les plus importantes sont souvent  packets, anomaly_score, bytes, cpu_percent, mem_percent, certains ports ou OS.
+
+On garde les keep variables les plus importantes pour construire des modèles plus simples sans trop perdre en performance.
+
+12. Question 11 – Fonction d’évaluation et comparaison des modèles
+Objectif
+
+Comparer plusieurs modèles de classification sur différents sous-ensembles de features.
+
+Schéma de code
+from sklearn.preprocessing import LabelEncoder
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.svm import SVC
+
+le = LabelEncoder()
+y_train_enc = le.fit_transform(y_train_used)
+y_test_enc  = le.transform(y_test_used)
+
+def make_models_dict()
+    return {
+        logreg LogisticRegression(max_iter=1000, solver=liblinear),
+        knn KNeighborsClassifier(n_neighbors=3),
+        nb GaussianNB(),
+        tree DecisionTreeClassifier(max_depth=5, random_state=13),
+        rf RandomForestClassifier(n_estimators=100, random_state=13),
+        svc_linear SVC(kernel=linear, probability=True, random_state=13),
+        svc_rbf SVC(kernel=rbf, probability=True, random_state=13),
+    }
+
+def evaluate_models(X_train, X_test, y_train, y_test, models)
+    results = {}
+    for name, model in models.items()
+        model.fit(X_train, y_train)
+        y_pred = model.predict(X_test)
+
+        acc  = accuracy_score(y_test, y_pred)
+        prec = precision_score(y_test, y_pred, average=binary, pos_label=1)
+        rec  = recall_score(y_test, y_pred, average=binary, pos_label=1)
+        f1   = f1_score(y_test, y_pred, average=binary, pos_label=1)
+
+        print(f{name10s}  acc={acc.3f}  prec={prec.3f}  rec={rec.3f}  f1={f1.3f})
+        results[name] = dict(accuracy=acc, precision=prec, recall=rec, f1=f1)
+    return results
+
+
+On applique cette fonction 
+
+avec toutes les features,
+
+avec features ANOVA (top k),
+
+avec features RFE+SVC,
+
+avec features RF embedded.
+
+Interprétation générale
+
+Les modèles DecisionTree et RandomForest donnent souvent les meilleurs scores (accuracy et F1 très élevés).
+
+Les SVM (surtout avec noyau RBF) se comportent aussi très bien.
+
+Naive Bayes est plus faible car il suppose l’indépendance des variables (ce qui est faux dans ce dataset).
+
+La sélection de variables (surtout RFE+SVC) permet d’obtenir de très bonnes performances avec seulement quelques features.
+
+13. Question 12 – Optimisation de RandomForest (GridSearchCV)
+Objectif
+
+Chercher automatiquement les meilleurs hyperparamètres pour RandomForest via validation croisée.
+
+Schéma de code
+from sklearn.model_selection import GridSearchCV
+
+rf = RandomForestClassifier(random_state=13)
+
+param_grid_rf = {
+    n_estimators [50, 100, 150, 200, 300],
+    max_depth [None, 5, 10]
+}
+
+grid_rf = GridSearchCV(
+    rf,
+    param_grid_rf,
+    cv=4,
+    scoring=f1,
+    n_jobs=-1
+)
+
+grid_rf.fit(X_train_used, y_train_enc)
+
+print(Meilleurs paramètres , grid_rf.best_params_)
+print(Meilleur F1 CV =, grid_rf.best_score_)
+
+Explication
+
+GridSearchCV teste systématiquement toutes les combinaisons de n_estimators et max_depth.
+
+Pour chaque combinaison, il effectue une validation croisée (ici cv=4) et calcule le F1 moyen.
+
+best_params_ donne la combinaison optimale, best_score_ le meilleur F1 moyen.
+
+On entraîne ensuite un RF avec ces paramètres et on l’évalue sur le test.
+
+14. Question 13 – Analyse globale des méthodes de sélection et des modèles
+Idées à écrire (exemple)
+
+Les modèles à base d’arbres (DecisionTree, RandomForest) et les SVM avec noyau RBF sont les plus performants sur ce dataset.
+
+SMOTE améliore clairement le rappel de la classe malicieuse en corrigeant le déséquilibre de classes.
+
+La sélection de features 
+
+ANOVA est simple mais ne tient pas compte des interactions.
+
+RFE+SVC fournit un sous-ensemble très compact de variables très discriminantes.
+
+L’embedded RF capture des relations non linéaires.
+
+Selon les résultats, RFE+SVC est particulièrement efficace  avec peu de features (dst_port, packets, anomaly_score, certains hostnamesowners), on atteint déjà d’excellentes performances.
+
+15. Question 14 – VotingClassifier (ensemble)
+Objectif
+
+Combiner plusieurs modèles forts dans un ensemble pour améliorer robustesse et performance.
+
+Schéma de code
+from sklearn.ensemble import VotingClassifier
+
+clf_rf  = RandomForestClassifier(n_estimators=100, random_state=13)
+clf_svc = SVC(kernel=rbf, probability=True, random_state=13)
+clf_knn = KNeighborsClassifier(n_neighbors=3)
+
+voting = VotingClassifier(
+    estimators=[(rf, clf_rf), (svc, clf_svc), (knn, clf_knn)],
+    voting=soft
+)
+
+voting.fit(X_train_used, y_train_enc)
+y_pred_v = voting.predict(X_test_used)
+
+
+On calcule ensuite accuracy, precision, recall, F1 comme pour les autres modèles.
+
+Explication
+
+En soft voting, chaque modèle produit des probabilités de classe.
+
+Le VotingClassifier fait la moyenne des probabilités et prend la classe avec la probabilité moyenne la plus élevée.
+
+Ça permet de tirer parti des forces de chaque modèle (RF, SVC, KNN) et de réduire le risque d’erreurs spécifiques à un modèle.
+
+16. Conclusion
+
+Ce TP montre un pipeline complet de machine learning appliqué à la détection d’anomalies réseau 
+
+prétraitement (imputation, normalisation, encodage),
+
+gestion du déséquilibre des classes (SMOTE),
+
+réduction de dimension (PCA),
+
+sélection de variables (ANOVA, RFE, RandomForest),
+
+comparaison de nombreux modèles (logreg, KNN, NB, arbres, forêts, SVM),
+
+optimisation d’hyperparamètres (GridSearch),
+
+combinaison de modèles (VotingClassifier).
+
+Les résultats mettent en évidence que 
+
+des modèles robustes comme RandomForest et SVM RBF,
+
+combinés à une bonne sélection de features et à SMOTE,
+
+permettent d’obtenir une excellente détection du trafic malicieux.

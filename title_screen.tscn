@@ -1,0 +1,123 @@
+[gd_scene load_steps=17 format=3 uid="uid://bq3dxcrml6v1s"]
+
+[ext_resource type="Script" uid="uid://bgel0cu5khoow" path="res://title_screen.gd" id="1_ak2if"]
+[ext_resource type="Texture2D" uid="uid://di5eyoxtsmpyb" path="res://art/main_menu.png" id="2_05l2w"]
+[ext_resource type="Texture2D" uid="uid://d3xdxuqwrt7jn" path="res://art/auto (1).png" id="3_xfn3p"]
+[ext_resource type="Texture2D" uid="uid://cpfm67jb6v106" path="res://art/manual (2).png" id="4_rhgbh"]
+[ext_resource type="Texture2D" uid="uid://bxegklkw7hqqp" path="res://art/manuald.png" id="4_xfn3p"]
+[ext_resource type="Texture2D" uid="uid://rat8o5emg4d5" path="res://art/autod.png" id="6_rhgbh"]
+[ext_resource type="Texture2D" uid="uid://dkx16ymay1irs" path="res://art/seat- (1).png" id="6_skmiq"]
+[ext_resource type="Texture2D" uid="uid://c6qb5mipx6l41" path="res://art/seat-d (1).png" id="7_lf08s"]
+[ext_resource type="Texture2D" uid="uid://dlhhiqijl7sfi" path="res://art/seat+ (1).png" id="8_n1yhu"]
+[ext_resource type="Texture2D" uid="uid://2c71gtg1mwkf" path="res://art/seat+d (1).png" id="9_xfn3p"]
+[ext_resource type="Texture2D" uid="uid://qlhbspj0llnl" path="res://art/start (1).png" id="10_q7w76"]
+[ext_resource type="Texture2D" uid="uid://cretri6htt3p8" path="res://art/startd.png" id="12_skmiq"]
+[ext_resource type="Texture2D" uid="uid://b7v8b670oiroq" path="res://art/girl_right.png" id="13_lf08s"]
+[ext_resource type="Texture2D" uid="uid://d3xt0btsap4ut" path="res://art/help.png" id="14_q7w76"]
+[ext_resource type="Texture2D" uid="uid://b4vj0sr355vgw" path="res://art/helpd.png" id="15_wot2p"]
+[ext_resource type="Texture2D" uid="uid://b77tv8ufuy58u" path="res://art/h.png" id="16_wot2p"]
+
+[node name="TitleScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_ak2if")
+
+[node name="TitleScBackgroundreen" type="TextureRect" parent="."]
+layout_mode = 0
+offset_left = 1.0
+offset_top = -7.0
+offset_right = 1800.0
+offset_bottom = 901.0
+texture = ExtResource("2_05l2w")
+expand_mode = 1
+
+[node name="AutoButton" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 317.0
+offset_top = 381.0
+offset_right = 567.0
+offset_bottom = 631.0
+texture_normal = ExtResource("3_xfn3p")
+texture_pressed = ExtResource("6_rhgbh")
+stretch_mode = 0
+
+[node name="ManualButton" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 543.0
+offset_top = 324.0
+offset_right = 901.0
+offset_bottom = 675.0
+texture_normal = ExtResource("4_rhgbh")
+texture_pressed = ExtResource("4_xfn3p")
+stretch_mode = 0
+
+[node name="LabSeatsLabel" type="Label" parent="."]
+layout_mode = 0
+offset_left = 1356.0
+offset_top = 450.0
+offset_right = 1466.0
+offset_bottom = 567.0
+text = "4"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="SeatsMinus" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 1163.0
+offset_top = 458.0
+offset_right = 1263.0
+offset_bottom = 558.0
+texture_normal = ExtResource("6_skmiq")
+texture_pressed = ExtResource("7_lf08s")
+
+[node name="SeatsPlus" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 1254.0
+offset_top = 458.0
+offset_right = 1354.0
+offset_bottom = 558.0
+texture_normal = ExtResource("8_n1yhu")
+texture_pressed = ExtResource("9_xfn3p")
+
+[node name="StartButton" type="TextureButton" parent="."]
+layout_mode = 0
+offset_left = 898.0
+offset_top = 385.0
+offset_right = 1148.0
+offset_bottom = 635.0
+texture_normal = ExtResource("10_q7w76")
+texture_pressed = ExtResource("12_skmiq")
+
+[node name="GirlSprite" type="Sprite2D" parent="."]
+position = Vector2(455, 726)
+texture = ExtResource("13_lf08s")
+
+[node name="HelpButton" type="TextureButton" parent="."]
+layout_mode = 0
+offset_right = 40.0
+offset_bottom = 40.0
+texture_normal = ExtResource("14_q7w76")
+texture_pressed = ExtResource("15_wot2p")
+
+[node name="HelpPopup" type="TextureRect" parent="."]
+visible = false
+layout_mode = 0
+offset_left = 535.0
+offset_top = 38.0
+offset_right = 1335.0
+offset_bottom = 838.0
+mouse_filter = 0
+texture = ExtResource("16_wot2p")
+
+[node name="HelpBackButton" type="Button" parent="HelpPopup"]
+layout_mode = 1
+anchors_preset = -1
+anchor_right = 0.062000003
+offset_left = 336.0
+offset_top = 675.0
+offset_right = 420.4
+offset_bottom = 731.0
